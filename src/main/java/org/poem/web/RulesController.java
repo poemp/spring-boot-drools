@@ -35,6 +35,12 @@ public class RulesController {
     @Autowired
     private RulesDao rulesDao;
 
+    /**
+     * 验证规则是否合法
+     * @param rule
+     * @param json
+     * @return
+     */
     @ApiOperation(value = "验证规则是否合法",notes = verify)
     @RequestMapping(value = "/verify", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public JsonResponse ruleVerify(@RequestParam(value = "rule") String rule,
@@ -50,6 +56,12 @@ public class RulesController {
     }
 
 
+    /**
+     * 添加规则
+     * @param rule
+     * @param name
+     * @return
+     */
     @ApiOperation(value = "添加规则")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "rule", dataType = "String", required = true, value = "规则"),
@@ -60,6 +72,10 @@ public class RulesController {
         return new JsonResponse("");
     }
 
+    /**
+     * 规则列表
+     * @return
+     */
     @ApiOperation(value = "规则列表")
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public JsonResponse getRuleList() {
@@ -67,6 +83,12 @@ public class RulesController {
     }
 
 
+    /**
+     * 规则结果
+     * @param id
+     * @param json
+     * @return
+     */
     @ApiOperation(value = "规则结果")
     @RequestMapping(value = "/result", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public JsonResponse getResult(@RequestParam("id") Integer id, @RequestParam("json") String json) {
@@ -75,6 +97,12 @@ public class RulesController {
         return new JsonResponse(rulesService.getRulesWrite(id, person));
     }
 
+    /**
+     * 决策表转换
+     * @param file
+     * @return
+     * @throws IOException
+     */
     @ApiOperation(value = "决策表转换")
     @ApiImplicitParam(name = "file", dataType = "MultipartFile", required = true, value = "决策表xls")
     @RequestMapping(value = "/getRuleXls", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -91,6 +119,11 @@ public class RulesController {
         return new JsonResponse(rule);
     }
 
+    /**
+     * 删除规则
+     * @param id
+     * @return
+     */
     @ApiOperation(value = "删除规则")
     @ApiImplicitParam(name = "id", dataType = "Integer", required = true, value = "规则编号")
     @RequestMapping(value = "/delete", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -98,6 +131,13 @@ public class RulesController {
         return new JsonResponse(rulesDao.deleteRule(id));
     }
 
+    /**
+     * 修改规则
+     * @param rule
+     * @param id
+     * @param name
+     * @return
+     */
     @ApiOperation(value = "修改规则")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "rule", dataType = "String", required = true, value = "规则"),
@@ -108,6 +148,9 @@ public class RulesController {
         return new JsonResponse(rulesDao.updateRule(id, name, rule));
     }
 
+    /**
+     * 消息
+     */
     private final static String verify="规则：package com.xu.drools;\n" +
             "import com.xu.drools.bean.Person;\n" +
             "rule \"2\"\n" +

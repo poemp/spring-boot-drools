@@ -2,12 +2,12 @@
 package org.poem.common.web;
 
 
-
 import net.sf.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.poem.common.exception.BusinessException;
 import org.poem.common.exception.JsonResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,10 +20,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * 异常拦截器
+ *
+ * @author 曹莉
+ */
 @Component
 public class JsonHandlerExceptionResolver implements HandlerExceptionResolver {
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(JsonHandlerExceptionResolver.class);
 
     @ResponseBody
     @Override
@@ -40,14 +45,22 @@ public class JsonHandlerExceptionResolver implements HandlerExceptionResolver {
             response.setHeader("Content-type", "application/json;charset=UTF-8");
             response.getWriter().write(result.toString());
         } catch (IOException e) {
+            e.printStackTrace();
             logger.error("json response error", exception);
             logger.error("error", e);
         }
         return mv;
     }
 
-    private void logException(Object handler, HttpServletRequest request,
-                              Exception exception, Map<String, String[]> parameterMap) {
+    /**
+     * 发生异常
+     *
+     * @param handler
+     * @param request
+     * @param exception
+     * @param parameterMap
+     */
+    private void logException(Object handler, HttpServletRequest request, Exception exception, Map<String, String[]> parameterMap) {
         if (handler != null && HandlerMethod.class.isAssignableFrom(handler.getClass())) {
             try {
                 HandlerMethod handlerMethod = (HandlerMethod) handler;
@@ -66,13 +79,17 @@ public class JsonHandlerExceptionResolver implements HandlerExceptionResolver {
                 if (!methodMapping.startsWith("/")) {
                     methodMapping = "/" + methodMapping;
                 }
-                String userInfo;
+                String userInfo = "";
                 try {
-                    userInfo = request.getSession().getAttribute("AccountName").toString();
+                    Object account = request.getSession().getAttribute("AccountName");
+                    if (account != null){
+                        userInfo = account.toString();
+                    }
+
                 } catch (Exception e) {
+                    e.printStackTrace();
                     userInfo = "无授权回调";
                 }
-                Logger logger = LogManager.getLogger(beanType);
                 if (exception instanceof BusinessException) {
                     int level = ((BusinessException) exception).getLevel();
                     if (level > 4) {
